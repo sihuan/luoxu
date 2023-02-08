@@ -4,6 +4,7 @@ import logging
 from html import escape as htmlescape
 import re
 import time
+import redis
 
 from aiohttp import web
 from telethon.tl.types import User, ChatPhotoEmpty
@@ -22,6 +23,14 @@ class BaseHandler:
     origin = request.headers.get('Origin')
     if origin and origin not in request.config_dict['origins']:
       raise web.HTTPBadRequest
+
+    auth_redis = request.config_dict['auth_redis']
+    if auth_redis:
+      token = request.rel_url.query.get('token','')
+      if not token:
+        raise web.HTTPUnauthorized
+      if not auth_redis.exists(token):
+        raise web.HTTPForbidden
 
     st = time.time()
     res = await self._get(request)
@@ -172,10 +181,17 @@ def setup_app(
   dbconn, client, cache_dir,
   default_avatar, ghost_avatar,
   *,
+  auth_redis_url = None,
   prefix = '',
   origins = (),
 ):
   app = web.Application()
+
+  if auth_redis_url:
+    app['auth_redis'] = redis.from_url(auth_redis_url)
+  else:
+    app['auth_redis'] = None
+
   app['origins'] = origins
   app.router.add_get(f'{prefix}/search', SearchHandler(dbconn).get)
   app.router.add_get(f'{prefix}/groups', GroupsHandler(dbconn).get)

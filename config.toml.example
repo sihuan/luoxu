@@ -37,4 +37,5 @@ ghost_avatar = "ghost.jpg"
 origins = [
   "http://localhost",
 ]
+auth_redis_url = "redis://user:sEcRet@localhost:6379/0"
 # vim: se ft=toml:

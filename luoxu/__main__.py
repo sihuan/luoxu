@@ -82,6 +82,7 @@ class Indexer:
       os.path.abspath(cache_dir),
       os.path.abspath(web_config['default_avatar']),
       os.path.abspath(web_config['ghost_avatar']),
+      auth_redis_url = web_config['auth_redis_url'],
       prefix = web_config['prefix'],
       origins = web_config['origins'],
     )
