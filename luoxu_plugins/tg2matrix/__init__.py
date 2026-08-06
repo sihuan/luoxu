@@ -99,7 +99,7 @@ class TgChannelWatcher:
     event_id = self.db.get_matrix_event_id(channel_id, msg.id)
 
     now = datetime.datetime.now().astimezone()
-    if not event_id and msg.date - now > datetime.timedelta(days=30):
+    if not event_id and now - msg.date > datetime.timedelta(days=30):
       # don't create old messages
       return
 
